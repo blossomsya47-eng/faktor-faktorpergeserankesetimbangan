@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Virtual Lab Pergeseran Kesetimbangan Kimia</title>
+<style>
+:root{--bg:#07131f;--card:#0f2234;--line:#1f3d57;--tx:#e8f1f8;--mut:#8fa9bf;--ac:#2dd4bf;--am:#fbbf24;--rd:#fb7185;--bl:#60a5fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,"Segoe UI",Roboto,sans-serif;background:radial-gradient(ellipse at 15% -10%,#12405a 0,var(--bg) 55%) fixed;color:var(--tx);line-height:1.65}
+header{padding:30px 16px 10px;text-align:center}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:700;margin:0 0 .5rem}
+h1{font-size:clamp(1.6rem,4.5vw,2.6rem);background:linear-gradient(90deg,var(--ac),var(--am));-webkit-background-clip:text;background-clip:text;color:transparent}
+header p{color:var(--mut);margin:.2rem auto;max-width:640px}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;position:sticky;top:0;background:#07131fee;backdrop-filter:blur(6px);z-index:5;border-bottom:1px solid var(--line);justify-content:safe center}
+nav button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--mut);padding:8px 14px;border-radius:999px;cursor:pointer;font:inherit;font-size:.9rem}
+nav button.on{background:var(--ac);color:#04221e;border-color:var(--ac);font-weight:700}
+main{max-width:1000px;margin:0 auto;padding:18px 14px 50px}
+.pane{display:none}.pane.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.eq{font-size:1.25rem;text-align:center;padding:12px;border-radius:12px;background:#0a1a29;border:1px dashed var(--ac);margin:10px 0}
+.why{border-left:4px solid var(--am);background:#1b2a2a55;padding:10px 14px;border-radius:0 12px 12px 0;margin:10px 0}
+.why b{color:var(--am)}
+.live{border-left-color:var(--ac);background:#0a2a2a}
+.tubes{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.tb{background:#0a1a29;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.tb h4{margin:0 0 6px}
+.tube{width:54px;height:150px;margin:0 auto 8px;border:3px solid #cfe3f2;border-top:none;border-radius:0 0 30px 30px;position:relative;overflow:hidden;background:#ffffff0d}
+.liq{position:absolute;left:0;right:0;bottom:0;height:78%;transition:background .1s}
+.liq:after{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:#ffffff40}
+.bar{display:flex;align-items:center;gap:6px;font-size:.78rem;margin:3px 0;text-align:left}
+.bar span{width:66px;flex:none}.bar div{flex:1;height:8px;background:#ffffff14;border-radius:5px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:5px}
+.bar em{font-style:normal;width:38px;text-align:right;color:var(--mut)}
+.bt{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0}
+.bt button,.btn{border:1px solid var(--line);background:#12304a;color:var(--tx);padding:6px 4px;border-radius:8px;cursor:pointer;font:inherit;font-size:.8rem}
+.bt button:hover,.btn:hover{border-color:var(--ac)}
+.btn{padding:8px 14px;font-size:.9rem}.btn.p{background:var(--ac);color:#04221e;font-weight:700}
+.msg{font-size:.82rem;color:var(--mut);min-height:4.4em;margin:4px 0 0}
+.msg b{color:var(--am)}
+canvas{width:100%;max-width:400px;border-radius:12px;background:#08192a;border:1px solid var(--line);display:block;margin:0 auto}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}.row>*{flex:1 1 300px}
+input[type=range]{width:100%;accent-color:var(--ac)}
+.stat{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.stat div{flex:1 1 90px;background:#0a1a29;border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.stat b{display:block;font-size:1.25rem;color:var(--ac)}.stat small{color:var(--mut)}
+svg text{fill:var(--tx);font-size:12px;font-family:system-ui,sans-serif}
+.fl{stroke-dasharray:8 6;animation:fl 1s linear infinite}
+@keyframes fl{to{stroke-dashoffset:-14}}
+.q{margin-bottom:14px}.q p{margin:.3rem 0}
+.opt{display:block;width:100%;text-align:left;margin:5px 0;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:#0a1a29;color:var(--tx);cursor:pointer;font:inherit}
+.opt.ok{background:#064e3b;border-color:#34d399}.opt.no{background:#5b1d2a;border-color:var(--rd)}
+.ex{font-size:.88rem;color:var(--mut);margin-top:6px}
+@media (prefers-reduced-motion:reduce){.fl{animation:none}}
+</style>
+</head>
+<body>
+<header>
+<h1>Virtual Lab Pergeseran Kesetimbangan</h1>
+<p>Ubah faktornya sendiri, amati partikel dan warnanya, lalu simpulkan arah pergeseran kesetimbangan.</p>
+</header>
+<nav id="nav"></nav>
+<main>
+
+<section class="pane on" id="p0" data-t="Pendahuluan">
+<div class="card">
+<h2>Apa itu pergeseran kesetimbangan?</h2>
+<p>Pada reaksi reversibel, reaksi maju dan reaksi balik berlangsung terus. Kesetimbangan tercapai saat laju keduanya sama, sehingga konsentrasi zat tampak tetap. Karena itu disebut kesetimbangan dinamis.</p>
+<div class="eq">aA + bB ⇌ cC + dD &nbsp;&nbsp; K = [C]<sup>c</sup>[D]<sup>d</sup> / [A]<sup>a</sup>[B]<sup>b</sup></div>
+<h3>Asas Le Chatelier</h3>
+<div class="why"><b>Bunyi asas:</b> jika sistem yang setimbang diberi gangguan (aksi), maka sistem akan bergeser ke arah yang mengurangi pengaruh gangguan itu (reaksi).</div>
+<h3>Mengapa kesetimbangan harus bergeser?</h3>
+<p>Gangguan membuat perbandingan konsentrasi saat itu (disebut Q, kuosien reaksi) tidak lagi sama dengan K. Alam "menuntut" Q kembali sama dengan K, sehingga komposisi reaktan dan produk berubah sampai kesetimbangan baru terbentuk.</p>
+<div class="grid">
+<div class="why"><b>Q lebih kecil dari K</b><br>Produk terlalu sedikit, sistem bergeser ke kanan.</div>
+<div class="why"><b>Q lebih besar dari K</b><br>Produk terlalu banyak, sistem bergeser ke kiri.</div>
+<div class="why"><b>Q sama dengan K</b><br>Sistem sudah setimbang, tidak ada pergeseran.</div>
+</div>
+<p>Faktor yang bisa menggeser kesetimbangan: konsentrasi, tekanan dan volume, serta suhu. Katalis tidak menggeser kesetimbangan. Buka tab di atas untuk bereksperimen.</p>
+</div>
+</section>
+
+<section class="pane" id="p1" data-t="Konsentrasi">
+<div class="card">
+<h2>Pengaruh konsentrasi</h2>
+<div class="eq">Fe³⁺ (kuning) + SCN⁻ (tak berwarna) ⇌ FeSCN²⁺ (merah darah)</div>
+<div class="why"><b>Jika</b> konsentrasi pereaksi (Fe³⁺ atau SCN⁻) ditambah, <b>maka</b> jumlah pereaksi bertambah dan Q menjadi lebih kecil dari K, <b>akibatnya</b> kesetimbangan bergeser ke kanan sehingga FeSCN²⁺ bertambah dan warna makin merah. Jika produk (FeSCN²⁺) ditambah, kesetimbangan bergeser ke kiri dan warna memudar. Pengurangan zat menghasilkan arah yang berlawanan.</div>
+<p style="color:var(--mut);font-size:.88rem">Semua tabung dimulai dari komposisi dan warna yang sama. Coba tambah atau kurangi zat pada tiap tabung dengan variasi berbeda lalu bandingkan warnanya. Di laboratorium, Fe³⁺ dikurangi dengan NaOH (membentuk endapan Fe(OH)₃) dan SCN⁻ dikurangi dengan Ag⁺ (membentuk endapan AgSCN). Pengurangan FeSCN²⁺ di sini adalah simulasi ideal. Angka konsentrasi bersifat ilustratif (K = 100).</p>
+<div class="tubes" id="tubes"></div>
+<p style="text-align:center"><button class="btn" id="rst">Kembalikan semua tabung ke awal</button></p>
+</div>
+</section>
+
+<section class="pane" id="p2" data-t="Tekanan dan Volume">
+<div class="card">
+<h2>Pengaruh tekanan dan volume</h2>
+<div class="eq">2NO₂(g) ⇌ N₂O₄(g) &nbsp; (cokelat ⇌ tak berwarna)</div>
+<div class="why"><b>Jika</b> volume diperkecil, <b>maka</b> tekanan naik (volume dan tekanan berbanding terbalik). <b>Akibatnya</b> kesetimbangan bergeser ke sisi dengan jumlah mol gas lebih sedikit, yaitu ke kanan (2 mol menjadi 1 mol), sehingga NO₂ berkurang dan N₂O₄ bertambah. Jika volume diperbesar, tekanan turun dan kesetimbangan bergeser ke sisi mol gas lebih banyak (kiri). Jika jumlah mol gas kiri dan kanan sama, tidak terjadi pergeseran.</div>
+<div class="row">
+<div><canvas id="cv1" width="400" height="230"></canvas></div>
+<div>
+<label>Volume wadah: <b id="v1t">50</b> satuan (geser untuk memampatkan)</label>
+<input type="range" id="v1" min="20" max="100" value="50">
+<div class="stat"><div><b id="s1p">1.0x</b><small>tekanan relatif</small></div><div><b id="s1a">0</b><small>partikel NO₂</small></div><div><b id="s1b">0</b><small>partikel N₂O₄</small></div></div>
+<div class="why live" id="m1">Geser pengatur volume untuk melihat arah pergeseran.</div>
+</div></div>
+<p style="color:var(--mut);font-size:.85rem">Simulasi menggunakan model kualitatif. Jumlah partikel dibulatkan dan dihitung dari nilai Kc ilustratif pada 298 K.</p>
+</div>
+</section>
+
+<section class="pane" id="p3" data-t="Suhu">
+<div class="card">
+<h2>Pengaruh suhu</h2>
+<div class="eq">2NO₂(g) ⇌ N₂O₄(g) &nbsp; ΔH = −57 kJ (ke kanan melepas kalor)</div>
+<div class="why"><b>Jika</b> suhu dinaikkan, <b>maka</b> sistem menyerap kalor, jumlah NO₂ (reaktan) bertambah dan N₂O₄ (produk) berkurang. <b>Akibatnya</b> kesetimbangan bergeser ke arah reaksi endoterm, yaitu ke kiri, dan nilai K mengecil. Jika suhu diturunkan, sistem melepas kalor sehingga N₂O₄ bertambah dan NO₂ berkurang. Kesetimbangan bergeser ke kanan (eksoterm) dan K membesar.</div>
+<div class="row">
+<div><canvas id="cv2" width="400" height="230"></canvas></div>
+<div>
+<label>Suhu: <b id="t2t">298</b> K (<span id="t2c">25</span> °C)</label>
+<input type="range" id="t2" min="273" max="373" value="298">
+<div class="stat"><div><b id="s2a">0</b><small>partikel NO₂</small></div><div><b id="s2b">0</b><small>partikel N₂O₄</small></div><div><b id="s2k">0</b><small>nilai K relatif</small></div></div>
+<div class="why live" id="m2">Geser suhu untuk melihat warna gas dan arah pergeseran.</div>
+</div></div>
+</div>
+</section>
+
+<section class="pane" id="p4" data-t="Katalis">
+<div class="card">
+<h2>Peran katalis</h2>
+<div class="why"><b>Jika</b> katalis ditambahkan, <b>maka</b> energi aktivasi reaksi maju dan reaksi balik turun sama besar. <b>Akibatnya</b> kesetimbangan tercapai lebih cepat, tetapi jumlah reaktan dan produk saat setimbang serta nilai K tidak berubah. Katalis tidak menggeser kesetimbangan.</div>
+<div class="row">
+<div><canvas id="cv3" width="400" height="230"></canvas></div>
+<div>
+<label><input type="checkbox" id="cat"> Tambahkan katalis</label>
+<p><button class="btn p" id="run">Mulai reaksi</button></p>
+<div class="stat"><div><b id="c0">12.0</b><small>waktu tanpa katalis</small></div><div><b id="c1">-</b><small>waktu dengan katalis</small></div></div>
+<p style="color:var(--mut);font-size:.85rem">Waktu adalah satuan relatif untuk mencapai sekitar 95 persen komposisi setimbang. Garis putus-putus menunjukkan komposisi produk saat setimbang, yang sama untuk kedua kurva.</p>
+</div></div>
+</div>
+</section>
+
+<section class="pane" id="p5" data-t="Eksplorasi: Amonia">
+<div class="card">
+<h2>Pembuatan amonia di industri (proses Haber-Bosch)</h2>
+<div class="eq">N₂(g) + 3H₂(g) ⇌ 2NH₃(g) &nbsp; ΔH = −92 kJ</div>
+<svg viewBox="0 0 700 255" width="100%" role="img" aria-label="Diagram alir proses Haber-Bosch">
+<g fill="none" stroke="#2dd4bf" stroke-width="3"><path class="fl" d="M120 125H148"/><path class="fl" d="M192 125H230"/><path class="fl" d="M360 125H420"/><path class="fl" d="M520 125H590"/><path class="fl" stroke="#fbbf24" d="M470 155V228H170V147"/></g>
+<rect x="8" y="98" width="112" height="54" rx="10" fill="#12304a" stroke="#60a5fa"/><text x="64" y="121" text-anchor="middle">N₂ dan H₂</text><text x="64" y="138" text-anchor="middle">perbandingan 1 : 3</text>
+<circle cx="170" cy="125" r="22" fill="#12304a" stroke="#60a5fa"/><text x="170" y="129" text-anchor="middle">Pompa</text><text x="170" y="96" text-anchor="middle">150 sampai 300 atm</text>
+<rect x="230" y="70" width="130" height="110" rx="10" fill="#3b1d24" stroke="#fb7185"/><g stroke="#fbbf24" stroke-dasharray="4 3"><path d="M240 105H350"/><path d="M240 125H350"/><path d="M240 145H350"/></g><text x="295" y="62" text-anchor="middle">Reaktor 400 sampai 500 °C</text><text x="295" y="167" text-anchor="middle">katalis besi (Fe)</text>
+<rect x="420" y="95" width="100" height="60" rx="10" fill="#0e3a52" stroke="#60a5fa"/><text x="470" y="122" text-anchor="middle">Pendingin</text><text x="470" y="139" text-anchor="middle">NH₃ mengembun</text>
+<rect x="590" y="98" width="104" height="54" rx="10" fill="#12304a" stroke="#2dd4bf"/><text x="642" y="121" text-anchor="middle">NH₃ cair</text><text x="642" y="138" text-anchor="middle">diambil</text>
+<text x="320" y="246" text-anchor="middle" fill="#fbbf24">N₂ dan H₂ yang belum bereaksi didaur ulang ke reaktor</text>
+</svg>
+<div class="grid">
+<div class="why"><b>Tekanan tinggi</b><br>Pereaksi 4 mol gas, produk 2 mol gas. Tekanan tinggi menggeser kesetimbangan ke kanan sehingga NH₃ bertambah.</div>
+<div class="why"><b>Suhu kompromi</b><br>Reaksi ke kanan eksoterm, jadi suhu rendah menguntungkan hasil. Namun reaksi terlalu lambat, sehingga dipakai suhu sedang bersama katalis.</div>
+<div class="why"><b>Pemisahan produk</b><br>NH₃ didinginkan sampai cair dan diambil. Konsentrasi produk turun sehingga kesetimbangan terus bergeser ke kanan.</div>
+</div>
+<h3>Coba atur kondisi reaktor</h3>
+<div class="row"><div>
+<label>Suhu: <b id="ht">450</b> °C</label><input type="range" id="hT" min="200" max="600" value="450">
+<label>Tekanan: <b id="hp">200</b> atm</label><input type="range" id="hP" min="50" max="400" value="200">
+<p><button class="btn" id="hset">Kondisi industri (450 °C, 200 atm)</button></p>
+</div><div>
+<div class="bar"><span style="width:110px">Hasil NH₃</span><div><i id="hy" style="background:var(--ac)"></i></div><em id="hyv"></em></div>
+<div class="bar"><span style="width:110px">Laju reaksi</span><div><i id="hr" style="background:var(--am)"></i></div><em id="hrv"></em></div>
+<div class="why live" id="hm"></div>
+</div></div>
+<p style="color:var(--mut);font-size:.85rem">Batang di atas adalah ilustrasi kualitatif untuk melihat tren, bukan data eksperimen. Secara umum, hasil NH₃ sekali lewat reaktor hanya sekitar 10 sampai 20 persen, sehingga gas sisa didaur ulang.</p>
+</div>
+</section>
+
+<section class="pane" id="p6" data-t="Latihan Soal">
+<div class="card"><h2>Latihan soal</h2><div id="quiz"></div><div class="why live" id="score" style="display:none"></div></div>
+</section>
+
+</main>
+<script>
+const $=id=>document.getElementById(id);
+/* Navigasi */
+const panes=[...document.querySelectorAll('.pane')];
+panes.forEach((p,i)=>{const b=document.createElement('button');b.textContent=p.dataset.t;b.className=i?'':'on';b.onclick=()=>{panes.forEach((q,j)=>{q.classList.toggle('on',i==j);$('nav').children[j].classList.toggle('on',i==j)});scrollTo(0,0)};$('nav').appendChild(b)});
+
+/* Konsentrasi */
+const K=100,S0={f:.02,s:.02,p:.04};
+const SP=[['f','Fe³⁺','#fbbf24'],['s','SCN⁻','#94a3b8'],['p','FeSCN²⁺','#fb7185']];
+function solve(f,s,p){let lo=-p,hi=Math.min(f,s);for(let i=0;i<60;i++){const m=(lo+hi)/2;(p+m-K*(f-m)*(s-m)>0)?hi=m:lo=m}return(lo+hi)/2}
+function col(p){const t=Math.min(p/.1,1),a=[255,214,110],b=[150,10,30];return'rgb('+a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join()+')'}
+const tubes=[];
+for(let i=1;i<=4;i++){
+ const el=document.createElement('div');el.className='tb';
+ el.innerHTML='<h4>Tabung '+i+'</h4><div class="tube"><div class="liq"></div></div>'+SP.map(s=>'<div class="bar"><span>'+s[1]+'</span><div><i style="background:'+s[2]+'"></i></div><em></em></div>').join('')+
+ '<div class="bt">'+SP.map(s=>'<button data-k="'+s[0]+'" data-d="1">+ '+s[1]+'</button><button data-k="'+s[0]+'" data-d="-1">− '+s[1]+'</button>').join('')+'</div><p class="msg">Kondisi awal: setimbang.</p>';
+ $('tubes').appendChild(el);
+ const t={el,st:{...S0},ds:{...S0},raf:0};tubes.push(t);
+ const view=()=>{t.el.querySelector('.liq').style.background=col(t.ds.p);t.el.querySelectorAll('.bar').forEach((b,j)=>{const v=t.ds[SP[j][0]];b.querySelector('i').style.width=Math.min(v/.12*100,100)+'%';b.querySelector('em').textContent=v.toFixed(3)})};
+ t.view=view;view();
+ el.querySelectorAll('.bt button').forEach(b=>b.onclick=()=>{
+  const k=b.dataset.k,d=.01*b.dataset.d;
+  const n={...t.st};n[k]=Math.max(.002,n[k]+d);
+  const Q=n.p/(n.f*n.s),x=solve(n.f,n.s,n.p),tg={f:n.f-x,s:n.s-x,p:n.p+x};
+  const right=x>0;
+  t.el.querySelector('.msg').innerHTML='Q = <b>'+Q.toFixed(0)+'</b> '+(right?'lebih kecil':'lebih besar')+' dari K = 100. Kesetimbangan bergeser ke <b>'+(right?'kanan':'kiri')+'</b>: '+(right?'Fe³⁺ dan SCN⁻ berkurang, FeSCN²⁺ bertambah, warna makin merah.':'Fe³⁺ dan SCN⁻ bertambah, FeSCN²⁺ berkurang, warna memudar.');
+  cancelAnimationFrame(t.raf);t.ds={...n};t.view();t.st=tg;const from={...n},t0=performance.now();
+  (function step(now){const r=Math.min((now-t0)/1300,1),e=1-Math.pow(1-r,3);for(const q of 'fsp')t.ds[q]=from[q]+(tg[q]-from[q])*e;t.view();if(r<1)t.raf=requestAnimationFrame(step)})(t0);
+ });
+}
+$('rst').onclick=()=>tubes.forEach(t=>{cancelAnimationFrame(t.raf);t.st={...S0};t.ds={...S0};t.view();t.el.querySelector('.msg').textContent='Kondisi awal: setimbang.'});
+
+/* Gas: model 2NO2 <=> N2O4 */
+const nA=(V,T)=>{const k=4.69*Math.exp(6856*(1/T-1/298));return(-V+Math.sqrt(V*V+160*k*V))/(4*k)};
+const Kr=T=>Math.exp(6856*(1/T-1/298));
+function Gas(cv,get,cb){
+ const c=cv.getContext('2d'),P=[];let n=0;
+ const cnt=t=>P.filter(p=>p.t==t).length;
+ (function loop(){
+  requestAnimationFrame(loop);if(!cv.offsetParent)return;
+  const {V,T}=get(),a=nA(V,T),ta=Math.round(a),tb=Math.round((20-a)/2),L=14,w=3.2*V,R=L+w;
+  if(++n%8==0)[['a',ta],['b',tb]].forEach(([t,k])=>{const q=cnt(t);if(q<k){const g=Math.random()*6.28;P.push({t,x:L+10+Math.random()*(w-20),y:20+Math.random()*190,g})}else if(q>k)P.splice(P.findIndex(p=>p.t==t),1)});
+  const sp=2.2*Math.sqrt(T/298);
+  c.clearRect(0,0,400,230);
+  c.fillStyle='rgba(194,90,12,'+(.1+a/20*.5)+')';c.fillRect(L,8,w,214);
+  c.strokeStyle=T>330?'#fb7185':T<285?'#60a5fa':'#cfe3f2';c.lineWidth=3;
+  c.beginPath();c.moveTo(R+8,8);c.lineTo(L,8);c.lineTo(L,222);c.lineTo(R+8,222);c.stroke();
+  c.fillStyle='#8fa9bf';c.fillRect(R,8,10,214);c.fillRect(R+10,108,Math.max(386-R-10,0),12);
+  P.forEach(p=>{p.g+=(Math.random()-.5)*.3;p.x+=Math.cos(p.g)*sp;p.y+=Math.sin(p.g)*sp;
+   if(p.x<L+8){p.x=L+8;p.g=Math.PI-p.g}if(p.x>R-8){p.x=R-8;p.g=Math.PI-p.g}
+   if(p.y<16){p.y=16;p.g=-p.g}if(p.y>214){p.y=214;p.g=-p.g}
+   if(p.t=='a'){c.fillStyle='#c2410c';c.beginPath();c.arc(p.x,p.y,6,0,6.28);c.fill()}
+   else{c.fillStyle='#a5b4fc';c.strokeStyle='#a5b4fc';c.lineWidth=3;c.beginPath();c.moveTo(p.x-6,p.y);c.lineTo(p.x+6,p.y);c.stroke();[-6,6].forEach(o=>{c.beginPath();c.arc(p.x+o,p.y,4.5,0,6.28);c.fill()})}});
+  cb(a,ta,tb,V,T);
+ })();
+}
+/* Tekanan dan volume */
+let pv=50;const NO=(a,b,V,T)=>(a+b)*T/V/(14*298/50);
+Gas($('cv1'),()=>({V:+$('v1').value,T:298}),(a,ta,tb,V)=>{$('s1a').textContent=ta;$('s1b').textContent=tb;$('s1p').textContent=NO(a,(20-a)/2,V,298).toFixed(1)+'x';$('v1t').textContent=V});
+$('v1').oninput=e=>{const V=+e.target.value;if(V==pv)return;
+ $('m1').innerHTML=V<pv?'<b>Volume diperkecil</b>, tekanan naik. Sistem melawan dengan bergeser ke sisi mol gas lebih sedikit, yaitu <b>kanan</b>. NO₂ berkurang (cokelat memudar) dan N₂O₄ bertambah. Jumlah seluruh partikel gas menurun.':'<b>Volume diperbesar</b>, tekanan turun. Sistem melawan dengan bergeser ke sisi mol gas lebih banyak, yaitu <b>kiri</b>. NO₂ bertambah (cokelat makin pekat) dan N₂O₄ berkurang. Jumlah seluruh partikel gas meningkat.';pv=V};
+/* Suhu */
+let pt=298;
+Gas($('cv2'),()=>({V:50,T:+$('t2').value}),(a,ta,tb,V,T)=>{$('s2a').textContent=ta;$('s2b').textContent=tb;$('s2k').textContent=Kr(T).toFixed(2);$('t2t').textContent=T;$('t2c').textContent=T-273});
+$('t2').oninput=e=>{const T=+e.target.value;if(T==pt)return;
+ $('m2').innerHTML=T>pt?'<b>Suhu dinaikkan</b>: sistem menyerap kalor. Reaksi endoterm (ke <b>kiri</b>) berlangsung lebih dominan. NO₂ bertambah, N₂O₄ berkurang, gas makin cokelat tua, dan nilai K mengecil.':'<b>Suhu diturunkan</b>: sistem melepas kalor. Reaksi eksoterm (ke <b>kanan</b>) berlangsung lebih dominan. N₂O₄ bertambah, NO₂ berkurang, gas makin pucat, dan nilai K membesar.';pt=T};
+
+/* Katalis */
+const c3=$('cv3').getContext('2d');let tm=14,ra=0;
+function plot(){const X=t=>40+t/14*340,Y=y=>200-y*170,c=c3;c.clearRect(0,0,400,230);
+ c.strokeStyle='#8fa9bf';c.lineWidth=1.5;c.beginPath();c.moveTo(40,20);c.lineTo(40,200);c.lineTo(385,200);c.stroke();
+ c.fillStyle='#8fa9bf';c.font='11px sans-serif';c.fillText('produk',4,16);c.fillText('waktu',345,218);
+ c.setLineDash([5,4]);c.strokeStyle='#ffffff55';c.beginPath();c.moveTo(40,Y(.6));c.lineTo(385,Y(.6));c.stroke();c.setLineDash([]);
+ [[.25,'#94a3b8',1],[1,'#2dd4bf',$('cat').checked]].forEach(([k,cl,on])=>{if(!on)return;c.strokeStyle=cl;c.lineWidth=3;c.beginPath();for(let t=0;t<=tm;t+=.1){const y=.6*(1-Math.exp(-k*t));t?c.lineTo(X(t),Y(y)):c.moveTo(X(t),Y(y))}c.stroke()});
+ c.fillStyle='#94a3b8';c.fillText('tanpa katalis',50,40);if($('cat').checked){c.fillStyle='#2dd4bf';c.fillText('dengan katalis',50,56)}}
+$('cat').onchange=()=>{$('c1').textContent=$('cat').checked?(3/1).toFixed(1):'-';plot()};
+$('run').onclick=()=>{cancelAnimationFrame(ra);const t0=performance.now();(function s(n){tm=Math.min((n-t0)/3500,1)*14;plot();if(tm<14)ra=requestAnimationFrame(s)})(t0)};
+plot();
+
+/* Haber */
+function hab(){const T=+$('hT').value,P=+$('hP').value;$('ht').textContent=T;$('hp').textContent=P;
+ const y=100/(1+Math.exp((T-380)/70))*(.35+.65*(P-50)/350),r=100*Math.exp((T-600)/110);
+ $('hy').style.width=Math.min(y*2.2,100)+'%';$('hyv').textContent=y<25?'rendah':y<45?'sedang':'tinggi';
+ $('hr').style.width=r+'%';$('hrv').textContent=r<20?'lambat':r<50?'sedang':'cepat';
+ let m='';
+ if(T<=330)m='Suhu rendah menggeser kesetimbangan ke kanan dan hasil NH₃ besar, tetapi laju reaksi sangat lambat sehingga tidak ekonomis.';
+ else if(T>=520)m='Suhu terlalu tinggi: reaksi cepat, tetapi kesetimbangan bergeser ke kiri sehingga NH₃ yang terbentuk sedikit.';
+ else m='Suhu sedang: laju reaksi dengan katalis cukup cepat, dan hasil dapat diperbaiki dengan tekanan tinggi.';
+ m+=P>=300?' Tekanan sangat tinggi menaikkan hasil, tetapi alat dan energinya mahal.':P<=100?' Tekanan rendah kurang menggeser kesetimbangan ke kanan.':' Tekanan tinggi menggeser kesetimbangan ke arah mol gas lebih sedikit (NH₃).';
+ $('hm').textContent=m}
+$('hT').oninput=$('hP').oninput=hab;$('hset').onclick=()=>{$('hT').value=450;$('hP').value=200;hab()};hab();
+
+/* Kuis */
+const Q=[
+['Reaksi N₂(g) + 3H₂(g) ⇌ 2NH₃(g) memiliki ΔH = −92 kJ. Jika suhu dinaikkan, apa yang terjadi?',['Kesetimbangan bergeser ke kanan sehingga NH₃ bertambah','Kesetimbangan bergeser ke kiri sehingga NH₃ berkurang dan N₂ serta H₂ bertambah','Kesetimbangan tidak bergeser','Hanya laju reaksi maju yang naik'],1,'Reaksi ke kanan eksoterm. Kenaikan suhu mendorong sistem menyerap kalor, yaitu ke arah endoterm (kiri).'],
+['Pada Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺, ke dalam campuran setimbang ditambahkan larutan KSCN. Apa pengamatannya?',['Warna merah makin pekat','Warna merah memudar','Warna tidak berubah','Muncul endapan putih'],0,'Penambahan SCN⁻ membuat Q lebih kecil dari K, sehingga kesetimbangan bergeser ke kanan dan FeSCN²⁺ yang berwarna merah bertambah.'],
+['Pada 2NO₂(g) ⇌ N₂O₄(g), volume sistem diperbesar pada suhu tetap. Ke mana kesetimbangan bergeser dan mengapa?',['Ke kanan, karena mol gas pereaksi lebih banyak','Ke kiri, karena mol gas di sisi kiri lebih banyak','Ke kanan, karena tekanan naik','Tidak bergeser'],1,'Volume besar berarti tekanan turun. Sistem bergeser ke sisi dengan mol gas lebih banyak, yaitu kiri (2 mol).'],
+['Ke dalam reaksi setimbang ditambahkan katalis. Pernyataan yang benar adalah ...',['Kesetimbangan bergeser ke kanan dan K membesar','Kesetimbangan bergeser ke kiri dan K mengecil','Kesetimbangan lebih cepat tercapai, komposisi setimbang dan K tidak berubah','Reaksi balik berhenti'],2,'Katalis menurunkan energi aktivasi maju dan balik sama besar, sehingga hanya mempercepat tercapainya kesetimbangan.'],
+['Pada H₂(g) + I₂(g) ⇌ 2HI(g), tekanan dinaikkan dengan memperkecil volume. Apa yang terjadi?',['Bergeser ke kanan','Bergeser ke kiri','Tidak bergeser karena jumlah mol gas kiri dan kanan sama','Nilai K membesar'],2,'Mol gas kiri (2) sama dengan kanan (2), sehingga perubahan tekanan tidak mengubah posisi kesetimbangan.']];
+let done=0,sc=0;
+Q.forEach((q,i)=>{const d=document.createElement('div');d.className='q';
+ d.innerHTML='<p><b>'+(i+1)+'.</b> '+q[0]+'</p>'+q[1].map((o,j)=>'<button class="opt" data-j="'+j+'">'+'ABCD'[j]+'. '+o+'</button>').join('')+'<div class="ex"></div>';
+ d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(d.dataset.a)return;d.dataset.a=1;const j=+b.dataset.j;
+  d.querySelectorAll('.opt')[q[2]].classList.add('ok');if(j!=q[2])b.classList.add('no');else sc++;
+  d.querySelector('.ex').textContent=(j==q[2]?'Benar. ':'Belum tepat. ')+q[3];
+  if(++done==Q.length){const s=$('score');s.style.display='block';s.innerHTML='<b>Skor kamu: '+sc+' dari '+Q.length+'.</b> '+(sc==5?'Pemahamanmu sudah kuat.':'Ulangi eksperimen pada tab faktor yang masih keliru, lalu coba lagi.')}});
+ $('quiz').appendChild(d)});
+</script>
+</body>
+</html>
